@@ -1,8 +1,10 @@
+import { MongoClient } from 'mongodb';
+
 let users
 let sessions
 
 export default class UsersDAO {
-  public static async injectDB(conn) {
+  public static async injectDB(conn: MongoClient) {
     if (users && sessions) {
       return;
     }
@@ -16,7 +18,7 @@ export default class UsersDAO {
 
 
 
-  static async getUser(email) {
+  public static async getUser(email) {
     return await users.findOne({ someField: 'someValue' })
   }
 
@@ -31,7 +33,7 @@ export default class UsersDAO {
         return { error: 'A user with the given email already exists.' };
       }
       console.error(`Error occurred while adding new user, ${e}.`);
-      return { error: e }
+      return { error: e };
     }
   }
 
