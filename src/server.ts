@@ -1,13 +1,13 @@
 import * as bodyParser from 'body-parser';
-import cors from 'cors';
+import * as cors from 'cors';
 import * as express from 'express';
-import morgan from 'morgan';
-import users from "../src/api/users.route";
+import * as morgan from 'morgan';
+import users from '../src/api/users.route';
 
 const server = express();
 
 server.use(cors());
-process.env.NODE_ENV !== "prod" && server.use(morgan("dev"));
+process.env.NODE_ENV !== "prod" && server.use(morgan('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 
