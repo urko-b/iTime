@@ -1,0 +1,40 @@
+version: "3"
+services:
+  itimeapi:
+    build: .
+    restart: always
+    networks:
+      - nodeapp-network
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URL=${MONGO_URL}
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - WEBAPINAME=${WEBAPINAME}
+      - VERSION=${VERSION}
+      - AUDIT_LOG=${AUDIT_LOG}
+    before_script:
+      - mongoimport --host mongo --db NodeAPI_test --collection audit_log --type json --file mongo-seed/audit_log.json --jsonArray
+      - mongoimport --host mongo --db NodeAPI_test --collection book --type json --file mongo-seed/book.json --jsonArray
+      - mongoimport --host mongo --db NodeAPI_test --collection collaborators --type json --file mongo-seed/collaborators.json --jsonArray
+      - mongoimport --host mongo --db NodeAPI_test --collection collections_schemas --type json --file mongo-seed/collections_schemas.json --jsonArray
+      - mongoimport --host mongo --db NodeAPI_test --collection crag --type json --file mongo-seed/crag.json --jsonArray
+      - mongoimport --host mongo --db NodeAPI_test --collection system_tokens --type json --file mongo-seed/system_tokens.json --jsonArray
+      - mongoimport --host mongo --db NodeAPI_test --collection tree --type json --file mongo-seed/tree.json --jsonArray
+    volumes:
+      - .:/usr/src/app:z
+      - /usr/src/app/node_modules
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    command: mongod --port ${MONGO_PORT}
+    ports:
+      - ${MONGO_PORT}
+    networks:
+      - nodeapp-network
+networks:
+    nodeapp-network:
+      driver: bridge

@@ -1,16 +1,17 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, Collection } from 'mongodb';
+import { LogDao } from './log.dao';
 
-let users
-let sessions
+let users: Collection<any>;
+const collectionName = 'users';
 
 export default class UsersDAO {
   public static async injectDB(conn: MongoClient) {
-    if (users && sessions) {
+    if (users) {
       return;
     }
     try {
-      users = await conn.db(process.env.CLUSTER_DB_NS).collection('users');
-      sessions = await conn.db(process.env.CLUSTER_DB_NS).collection('sessions');
+      users = await conn.db(process.env.CLUSTER_DB_NS).collection(collectionName);
+      await LogDao.listenOnChanges(collectionName);
     } catch (e) {
       console.error(`Unable to establish collection handles in userDAO: ${e}`);
     }
@@ -18,8 +19,33 @@ export default class UsersDAO {
 
 
 
-  public static async getUser(email) {
-    return await users.findOne({ someField: 'someValue' })
+  public static async getUserByEmail(email) {
+    try {
+      return await users.findOne({ email: email });
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+
+  public static async getUsers() {
+    try {
+      return await users.find({}, { projection: { email: 1, } }).toArray();
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  }
+
+  public static async getUserByCard(cardId) {
+    try {
+      const user = await users.findOne({ 'cards': { '$in': [cardId] } });
+      return user;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 
 
@@ -38,12 +64,12 @@ export default class UsersDAO {
   }
 
 
-  public static async loginUser(email, jwt) {
+  public static async loginUser(email) {
     try {
-      await sessions.updateOne(
-        { someField: 'someValue' },
-        { $set: { someOtherField: 'someOtherValue' } },
-      );
+      // await sessions.updateOne(
+      //   { email: email },
+      //   { $set: { someOtherField: 'someOtherValue' } },
+      // );
       return { success: true };
     } catch (e) {
       console.error(`Error occurred while logging in user, ${e}`)
@@ -53,96 +79,12 @@ export default class UsersDAO {
 
   public static async logoutUser(email) {
     try {
-      await sessions.deleteOne({ someField: 'someValue' });
+      // await sessions.deleteOne({ someField: 'someValue' });
       return { success: true };
     } catch (e) {
-      console.error(`Error occurred while logging out user, ${e}`)
+      console.error(`Error occurred while logging out user, ${e}`);
       return { error: e };
     }
   }
 
-  public static async getUserSession(email) {
-    try {
-      return sessions.findOne({ someField: 'someValue' });
-    } catch (e) {
-      console.error(`Error occurred while retrieving user session, ${e}`);
-      return null;
-    }
-  }
-
-  public static async deleteUser(email) {
-    try {
-      await users.deleteOne({ email });
-      await sessions.deleteOne({ user_id: email });
-      if (!(await this.getUser(email)) && !(await this.getUserSession(email))) {
-        return { success: true };
-      } else {
-        console.error(`Deletion unsuccessful`);
-        return { error: `Deletion unsuccessful` };
-      }
-    } catch (e) {
-      console.error(`Error occurred while deleting user, ${e}`);
-      return { error: e };
-    }
-  }
-
-
-  public static async updatePreferences(email, preferences) {
-    try {
-
-      preferences = preferences || {};
-
-      const updateResponse: any = {};
-      // await users.updateOne(
-      //   { someField: someValue },
-      //   { $set: { someOtherField: someOtherValue } },
-      // )
-
-      if (updateResponse.matchedCount === 0) {
-        return { error: 'No user found with that email' };
-      }
-      return updateResponse;
-    } catch (e) {
-      console.error(
-        `An error occurred while updating this user's preferences, ${e}`,
-      );
-      return { error: e };
-    }
-  }
-
-  public static async checkAdmin(email) {
-    try {
-      const { isAdmin } = await this.getUser(email);
-      return isAdmin || false;
-    } catch (e) {
-      return { error: e };
-    }
-  }
-
-  public static async makeAdmin(email) {
-    try {
-      const updateResponse = users.updateOne(
-        { email },
-        { $set: { isAdmin: true } },
-      );
-      return updateResponse;
-    } catch (e) {
-      return { error: e };
-    }
-  }
 }
-
-/**
- * Parameter passed to addUser method
- * @typedef UserInfo
- * @property {string} name
- * @property {string} email
- * @property {string} password
- */
-
-/**
- * Success/Error return object
- * @typedef DAOResponse
- * @property {boolean} [success] - Success
- * @property {string} [error] - Error
- */

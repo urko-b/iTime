@@ -3,7 +3,10 @@ import app from './server';
 import * as dotenv from 'dotenv';
 
 import { MongoClient } from 'mongodb';
+import TimeTrackingDAO from './dao/time-tracking.dao';
 import UsersDAO from './dao/users.dao';
+import DeviceTokenDAO from './dao/device-token.dao';
+import { LogDao } from './dao/log.dao';
 
 const port = process.env.PORT || 8000;
 
@@ -23,24 +26,11 @@ MongoClient.connect(
     process.exit(1);
   })
   .then(async (client: MongoClient) => {
-    // await MoviesDAO.injectDB(client)
     await UsersDAO.injectDB(client);
-    // await CommentsDAO.injectDB(client)
+    await TimeTrackingDAO.injectDB(client);
+    await DeviceTokenDAO.injectDB(client);
+    await LogDao.injectDB(client);
     app.listen(port, () => {
       console.log(`listening on port ${port}`);
     });
   });
-
-
-  // mongoose.connect(process.env.DB, { useFindAndModify: false }, connectionError => {
-//   if (connectionError) {
-//     return console.error(
-//       `Error while connecting to database: ${connectionError}`
-//     );
-//   }
-
-//   const app = new server.App(process.env.PORT);
-//   app.init();
-
-//   app.run();
-// });

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node -r ts-node/register ./index.ts",
-    "start:watch": "nodemon -r dotenv/config ./index.js",
+    "start-watch": "nodemon -r dotenv/config ./index.js",
     "tsc": "node_modules/.bin/tsc",
     "prod": "node_modules/.bin/tsc && nodemon --config nodemon.json ./dist/index.js",
     "build": "tsc",
@@ -31,6 +31,7 @@
   "author": "Pablo Guerrero González",
   "license": "ISC",
   "dependencies": {
+    "@types/jsonwebtoken": "^8.3.2",
     "@types/node": "^11.9.4",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.4",
@@ -39,13 +40,17 @@
     "fast-json-patch": "^2.0.7",
     "jsonwebtoken": "^8.3.0",
     "method-override": "^3.0.0",
+    "moment": "^2.24.0",
+    "moment-duration-format": "^2.2.2",
     "mongodb": "^3.2.4",
     "morgan": "^1.9.1",
+    "socket.io": "^2.2.0",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.3"
   },
   "devDependencies": {
     "@microsoft/tsdoc": "^0.12.8",
+    "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "^1.17.0",
     "@types/express": "^4.16.1",
     "@types/method-override": "0.0.31",

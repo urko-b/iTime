@@ -1,17 +1,11 @@
 import { Router } from 'express';
-// import commentsCtrl from './comments.controller';
-import usersCtrl from './users.controller';
+import usersCtrl from './controllers/users.controller';
 
 // @ts-ignore
 const router = new Router();
 
-// associate put, delete, and get(id)
-router.route('/register').post(usersCtrl.register);
+router.route('/').get(usersCtrl.GetUsers);
 router.route('/login').post(usersCtrl.login);
-router.route('/logout').post(usersCtrl.logout);
-router.route('/delete').delete(usersCtrl.delete);
-router.route('/update-preferences').put(usersCtrl.save);
-// router.route('/comment-report').get(commentsCtrl.apiCommentReport);
-router.route('/make-admin').post(usersCtrl.createAdminUser);
+router.route('/roles').get(usersCtrl.GetUserRoles);
 
 export default router;
