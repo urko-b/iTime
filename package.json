@@ -57,7 +57,7 @@
     "@types/mocha": "^5.2.6",
     "@types/mongoose": "^5.3.17",
     "@types/morgan": "^1.7.35",
-    "mocha": "^6.0.2",
+    "mocha": "^10.2.0",
     "nodemon": "^1.18.10",
     "npm": "^6.9.0",
     "supertest": "^4.0.2",
